@@ -1,30 +1,45 @@
-using System;
 using UnityEngine;
-using Random = UnityEngine.Random;
+using Unity.Entities;
+using Unity.Mathematics;
+
+
+public struct RandomLevelConfig : IComponentData
+{
+    public Entity BrickPrefab;  
+    public int Count;          
+    public float3 BoundsMin;    
+    public float3 BoundsMax;    
+}
 
 public class BricksGenerator : MonoBehaviour
 {
+ 
     public BoxCollider bricksSpawnBounds;
-    public GameObject brickPrefab;
-    public int numOfBricks;
+    public GameObject brickPrefab; 
+    public int numOfBricks = 50;
 
-
-    private void Awake()
+    
+    class Baker : Baker<BricksGenerator>
     {
-       GenerateBricks();
-    }
-
-    private void GenerateBricks()
-    {
-        for (int i = 0; i < numOfBricks; i++)
+        public override void Bake(BricksGenerator authoring)
         {
-            Vector3 pos = bricksSpawnBounds.GetRandomPointInsideCollider();
-            Instantiate(brickPrefab, pos, Quaternion.Euler(new Vector3(0,Random.Range(0,360),0)) , this.transform);
+            if (authoring.brickPrefab == null || authoring.bricksSpawnBounds == null) return;
+            
+            Entity entity = GetEntity(TransformUsageFlags.None);
+            
+            Bounds bounds = authoring.bricksSpawnBounds.bounds;
+            
+            AddComponent(entity, new RandomLevelConfig
+            {
+                BrickPrefab = GetEntity(authoring.brickPrefab, TransformUsageFlags.Dynamic),
+                Count = authoring.numOfBricks,
+                
+                BoundsMin = (float3)bounds.min,
+                BoundsMax = (float3)bounds.max
+            });
         }
     }
-
-
-
+    
     private void OnDrawGizmos()
     {
         if (bricksSpawnBounds != null)
@@ -36,22 +51,4 @@ public class BricksGenerator : MonoBehaviour
             Gizmos.DrawWireCube(bricksSpawnBounds.bounds.center, bricksSpawnBounds.bounds.size);
         }
     }
-}
-
-
-
-public static class BoxColliderExtensions
-{
-    public static Vector3 GetRandomPointInsideCollider( this BoxCollider boxCollider )
-    {
-        Vector3 extents = boxCollider.size / 2f;
-        Vector3 point = new Vector3(
-            Random.Range( -extents.x, extents.x ),
-            Random.Range( -extents.y, extents.y ),
-            Random.Range( -extents.z, extents.z )
-        );
-
-        return boxCollider.transform.TransformPoint( point );
-    }
-
 }

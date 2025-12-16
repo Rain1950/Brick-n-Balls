@@ -1,5 +1,6 @@
 using System;
 using Core;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,6 +13,13 @@ namespace  UI
         [SerializeField] private Button startGameButton;
         [Header("GameHUD")]
         [SerializeField] private Canvas gameHUDCanvas;
+        [SerializeField] private TMP_Text shotsLeftText; 
+        [Header("GameFinished")]
+        [SerializeField] private Canvas gameFinishedCanvas;
+        [SerializeField] private TMP_Text endScoreText;
+        [SerializeField] private Button goBackToMenuButton;
+        
+        
     
         private void Awake()
         {
@@ -20,20 +28,30 @@ namespace  UI
 
         private void Start()
         {
-            if (GameManager.Instance != null)
-            {
-                GameManager.Instance.RegisterUIManager(this);
-            }
-            else
-            {
-                Debug.LogError("GameManager not found");
-            }
+            
+            GameManager.Instance.OnGameFinished += OnGameFinished;
+            CameraShooter.OnShoot += CameraShooterOnShoot;
+            InitializeGameHUD();
+            
+            
+        }
+
+       
+
+        private void OnGameFinished()
+        {
+            gameHUDCanvas.gameObject.SetActive(false);
+            gameFinishedCanvas.gameObject.SetActive(true);
+            endScoreText.text = $"Score: {ScoreManager.Instance.score}";
         }
 
         private void AddListeners()
         {
             startGameButton.onClick.AddListener(OnStartGameButtonClicked);
+            goBackToMenuButton.onClick.AddListener(OnGoBackToMenuButtonClicked);
         }
+
+ 
 
         #region MainMenu
 
@@ -45,6 +63,32 @@ namespace  UI
         }
 
         #endregion    
+        
+        #region GameHUD
+
+        private void InitializeGameHUD()
+        {
+            shotsLeftText.text = $"Shots Left: {GameManager.Instance.currentBallCount}";
+        }
+        
+        
+        private void CameraShooterOnShoot(int ammoCount)
+        {
+            shotsLeftText.text = $"Shots Left: {ammoCount}";
+        }
+            
+        
+        #endregion
+        
+        #region GameFinished
+        private void OnGoBackToMenuButtonClicked()
+        {
+            GameManager.Instance.RestartGame();
+            gameFinishedCanvas.gameObject.SetActive(false);
+            mainMenuCanvas.gameObject.SetActive(true);
+        }
+
+        #endregion
     
     
     }

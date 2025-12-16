@@ -9,7 +9,10 @@ namespace Core
     public class GameManager : MonoBehaviour
     {
         public static GameManager Instance {get; private set;}
-        private UIManager _uiManager;
+
+        public int ballCount = 20;
+        public int currentBallCount;
+        public event Action OnGameFinished;
         private void Awake()
         {
             if (Instance != null && Instance != this)
@@ -20,18 +23,49 @@ namespace Core
 
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            
+            ScoreManager.OnBallDied += ScoreManagerOnBallDied;
+            currentBallCount = ballCount;
+            SceneManager.sceneLoaded += SceneManagerOnsceneLoaded;
         }
 
-        public void RegisterUIManager(UIManager uiManager)
+        private void SceneManagerOnsceneLoaded(Scene scene, LoadSceneMode mode)
         {
-            _uiManager = uiManager;
-            Debug.Log("Registered UI Manager");
+            currentBallCount = ballCount;
         }
+
+
+        private void ScoreManagerOnBallDied()
+        {
+            currentBallCount--;
+            if (currentBallCount <= 0)
+            {
+                GameOver();
+            }
+        }
+
+        private void GameOver()
+        {
+            OnGameFinished?.Invoke();
+        }
+
+        public void RestartGame()
+        {
+            SceneManager.UnloadSceneAsync("GameScene");
+            SceneManager.LoadSceneAsync("MenuScene", LoadSceneMode.Additive);
+        }
+     
 
         public void StartGame()
         {
             SceneManager.UnloadSceneAsync("MenuScene");
-            SceneManager.LoadSceneAsync("GameScene",  LoadSceneMode.Additive);
+            var loadOp =  SceneManager.LoadSceneAsync("GameScene",  LoadSceneMode.Additive);
+            loadOp.completed += operation =>
+            {
+                SceneManager.SetActiveScene(SceneManager.GetSceneByName("GameScene"));
+            };
+
+
         }
     }
 
