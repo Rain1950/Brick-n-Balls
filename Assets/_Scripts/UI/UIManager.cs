@@ -2,6 +2,7 @@ using System;
 using Core;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace  UI
@@ -24,6 +25,15 @@ namespace  UI
         private void Awake()
         {
             AddListeners();
+            SceneManager.sceneLoaded += SceneManagerOnsceneLoaded;
+        }
+
+        private void SceneManagerOnsceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            if (scene.name == "GameScene")
+            {
+                InitializeGameHUD();
+            }
         }
 
         private void Start()

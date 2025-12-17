@@ -52,7 +52,12 @@ namespace Core
         public void RestartGame()
         {
             SceneManager.UnloadSceneAsync("GameScene");
-            SceneManager.LoadSceneAsync("MenuScene", LoadSceneMode.Additive);
+           var loadOp =   SceneManager.LoadSceneAsync("MenuScene", LoadSceneMode.Additive);
+           loadOp.completed += operation =>
+           {
+               SceneManager.SetActiveScene(SceneManager.GetSceneByName("MenuScene"));
+           };
+
         }
      
 
