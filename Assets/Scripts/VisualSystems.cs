@@ -11,7 +11,9 @@ public partial class VisualSyncSystem : SystemBase
     protected override void OnUpdate()
     {
 
-
+        var ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
+        var ecb = ecbSingleton.CreateCommandBuffer(World.Unmanaged);
+        
         foreach (var (physicsPos, entity) in SystemAPI.Query<RefRO<LocalTransform>>()
                      .WithAll<VisualData>()
                      .WithNone<TransformReference>()
@@ -26,11 +28,12 @@ public partial class VisualSyncSystem : SystemBase
                
                 newGO.transform.position = physicsPos.ValueRO.Position;
                 newGO.transform.rotation = physicsPos.ValueRO.Rotation;
-                EntityManager.AddComponentObject(entity, new TransformReference 
+                ecb.AddComponent(entity, new TransformReference 
                 { 
                     transform = newGO.transform 
                 });
-                EntityManager.RemoveComponent<VisualData>(entity);
+                
+                ecb.RemoveComponent<VisualData>(entity);
             }
         }
 

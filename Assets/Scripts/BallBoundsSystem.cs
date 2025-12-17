@@ -9,7 +9,7 @@ public partial class BallBoundsSystem : SystemBase
         var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
         var ecb = ecbSingleton.CreateCommandBuffer(World.Unmanaged);
 
-        float bottomLimit = -10.0f;
+        float bottomLimit = -30.0f;
 
         foreach (var (transform, entity) in SystemAPI.Query<RefRO<LocalTransform>>()
                      .WithAll<BallTag>()
