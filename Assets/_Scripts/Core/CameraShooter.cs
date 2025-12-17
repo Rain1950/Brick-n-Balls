@@ -14,6 +14,14 @@ public class CameraShooter : MonoBehaviour
     private EntityManager _entityManager;
 
     public static  event Action<int> OnShoot; 
+    
+    private GameInputActions _gameInputActions;
+
+
+    private void Awake()
+    {
+        _gameInputActions  = new GameInputActions();
+    }
 
     void Start()
     {
@@ -21,13 +29,24 @@ public class CameraShooter : MonoBehaviour
         ammoCount = GameManager.Instance.ballCount;
     }
 
-    void Update()
+
+    private void OnEnable()
     {
-        if (Mouse.current.leftButton.wasPressedThisFrame) 
-        {
-            Shoot();
-        }
+        _gameInputActions.Enable();
+        _gameInputActions.Gameplay.Fire.performed += OnFirePerformed;
     }
+
+
+    void OnDisable()
+    {
+        _gameInputActions.Disable();
+        _gameInputActions.Gameplay.Fire.performed -= OnFirePerformed;
+    }
+    private void OnFirePerformed(InputAction.CallbackContext ctx)
+    {
+         Shoot();
+    }
+    
 
     private void Shoot()
     {
