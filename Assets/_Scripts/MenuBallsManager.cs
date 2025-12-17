@@ -11,6 +11,7 @@ public class MenuBallsManager : MonoBehaviour
     [SerializeField] private AnimationCurve ballCurve;
     [SerializeField] private float speed = 5;
     [SerializeField] private float YAmplitude = 5;
+    [SerializeField] private float lifeTime = 5;
     private List<MenuBallData> menuBalls = new List<MenuBallData>();
 
     private class MenuBallData
@@ -48,16 +49,27 @@ public class MenuBallsManager : MonoBehaviour
 
     public void Update()
     {
-        
-        foreach (MenuBallData menuBall  in menuBalls)
+
+
+        for (int i = menuBalls.Count - 1; i >= 0; i--)
         {
+            MenuBallData menuBall = menuBalls[i];
+            
+            
             menuBall.Time += Time.deltaTime;
+            if (menuBall.Time >= lifeTime)
+            {
+                Destroy(menuBall.Ball);
+                menuBalls.RemoveAt(i);
+                continue;
+            }
             
             Vector3 pos = menuBall.Ball.transform.position;
             pos.x += speed * Time.deltaTime;
             pos.y  =  menuBall.InitPos.y +  ballCurve.Evaluate(menuBall.Time) * YAmplitude;
             menuBall.Ball.transform.position = pos;
         }
+        
     }
 
 

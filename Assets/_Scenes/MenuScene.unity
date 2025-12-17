@@ -194,6 +194,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   speed: 5
   YAmplitude: 5
+  lifeTime: 10
 --- !u!4 &171910733
 Transform:
   m_ObjectHideFlags: 0
