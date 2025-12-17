@@ -68,13 +68,13 @@ namespace  UI
 
         private void InitializeGameHUD()
         {
-            shotsLeftText.text = $"Shots Left: {GameManager.Instance.currentBallCount}";
+            shotsLeftText.text = $"Shots Left\n{GameManager.Instance.currentBallCount}";
         }
         
         
         private void CameraShooterOnShoot(int ammoCount)
         {
-            shotsLeftText.text = $"Shots Left: {ammoCount}";
+            shotsLeftText.text = $"Shots Left\n{ammoCount}";
         }
             
         
